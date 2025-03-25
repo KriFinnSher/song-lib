@@ -1,0 +1,10 @@
+server:
+  host: 127.0.0.1
+  port: 8080
+
+db:
+  host: db
+  port: 5432
+  user: postgres
+  pass: 1234
+  name: songDB

@@ -1,0 +1,248 @@
+definitions:
+  handlers.Request:
+    properties:
+      group:
+        type: string
+      song:
+        type: string
+    type: object
+  handlers.Response:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  handlers.SongResponse:
+    properties:
+      artist:
+        type: string
+      id:
+        type: integer
+      release_date:
+        type: string
+      source_link:
+        type: string
+      text:
+        type: string
+      title:
+        type: string
+    type: object
+  handlers.SongTextResponse:
+    properties:
+      text_parts:
+        items:
+          type: string
+        type: array
+    type: object
+  handlers.UpdateRequest:
+    properties:
+      artist:
+        type: string
+      release_date:
+        type: string
+      source_link:
+        type: string
+      text:
+        type: string
+      title:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API для управления музыкальной библиотекой
+  title: Song Library API
+  version: "1.0"
+paths:
+  /api/songs:
+    post:
+      consumes:
+      - application/json
+      description: Create a new song by providing the group and song title.
+      parameters:
+      - description: Song data
+        in: body
+        name: song
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.Request'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Song was created successfully
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "500":
+          description: Failed to create song
+          schema:
+            $ref: '#/definitions/handlers.Response'
+      summary: Create a new song
+      tags:
+      - songs
+  /api/songs/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a song from the database using its unique ID.
+      parameters:
+      - description: Song ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Song was deleted successfully
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "400":
+          description: Invalid song ID
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "404":
+          description: Song with this ID isn't present
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "500":
+          description: Failed to delete song
+          schema:
+            $ref: '#/definitions/handlers.Response'
+      summary: Delete a song by its ID
+      tags:
+      - songs
+    get:
+      consumes:
+      - application/json
+      description: Get the text of a song by its ID. If the song is not found, returns
+        a 404 error.
+      parameters:
+      - description: Song ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Song text retrieved successfully
+          schema:
+            $ref: '#/definitions/handlers.SongTextResponse'
+        "400":
+          description: Invalid song ID
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "404":
+          description: Song not found
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handlers.Response'
+      summary: Get song text by song ID
+      tags:
+      - songs
+    put:
+      consumes:
+      - application/json
+      description: Update an existing song by its ID. If the song is not found, returns
+        a 404 error.
+      parameters:
+      - description: Song ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Song data to update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Song updated successfully
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "400":
+          description: Invalid song ID or request body
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "404":
+          description: Song not found
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handlers.Response'
+      summary: Update a song by ID
+      tags:
+      - songs
+  /api/songs/filter:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of songs based on filter criteria like artist, title,
+        release date, text, and source link with pagination (limit and offset).
+      parameters:
+      - description: Artist name
+        in: query
+        name: artist
+        type: string
+      - description: Song title
+        in: query
+        name: title
+        type: string
+      - description: Release date
+        in: query
+        name: release_date
+        type: string
+      - description: Text content
+        in: query
+        name: text
+        type: string
+      - description: Source link
+        in: query
+        name: source_link
+        type: string
+      - description: Limit of results
+        in: query
+        name: limit
+        type: integer
+      - description: Offset for pagination
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of songs
+          schema:
+            items:
+              $ref: '#/definitions/handlers.SongResponse'
+            type: array
+        "400":
+          description: Invalid query parameters
+          schema:
+            $ref: '#/definitions/handlers.Response'
+        "500":
+          description: Failed to fetch songs
+          schema:
+            $ref: '#/definitions/handlers.Response'
+      summary: Get all songs with filtering and pagination
+      tags:
+      - songs
+swagger: "2.0"
